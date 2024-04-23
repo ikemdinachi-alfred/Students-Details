@@ -21,35 +21,43 @@ public class StudentController {
 
     @GetMapping("/view_all")
     public ResponseEntity<List<Student>>getStudents() {
-        return new ResponseEntity<>(studentService.getStudents(), HttpStatus.FOUND);
+        return new ResponseEntity<>(studentService.getStudents(), HttpStatus.OK);
     }
     @PostMapping("/register")
-    public ResponseEntity<Student> registerStudent(@RequestBody AddStudentRequest student) {
+    public ResponseEntity<String> registerStudent(@RequestBody AddStudentRequest student) {
         try {
-            return new ResponseEntity<>(studentService.addStudent(student), HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.OK).body(studentService.addStudent(student).toString());
         }
         catch (StudentExistException exception) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            System.out.println(exception.getMessage());
         }
+       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User details already exist");
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Student> updateStudent(@RequestBody UpdateStudentRequest  student, @PathVariable Long id) {
         try {
-            return  new ResponseEntity<>(studentService.updateStudent(student,id), HttpStatus.OK);
+            return  ResponseEntity.status(HttpStatus.OK).body(studentService.updateStudent(student,id));
         }
         catch (StudentNotFoundException exception) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
     @DeleteMapping("/delete/{id}")
-    public void deleteStudent(@PathVariable Long id) {
+    public ResponseEntity<String> deleteStudent(@PathVariable Long id) {
            studentService.deleteStudent(id);
+           return ResponseEntity.status(HttpStatus.OK).body("The student with id " + id + " was deleted.");
     }
 
     @GetMapping("/one/student/{id}")
-    public Student getStudentById(@PathVariable Long id){
-        return studentService.getStudentById(id);
+    public ResponseEntity<Student> getStudentById(@PathVariable Long id){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(studentService.getStudentById(id));
+        }catch (StudentNotFoundException exception){
+            System.out.println(exception.getMessage());
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }
