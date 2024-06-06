@@ -2,7 +2,6 @@ package com.alfredTech.studentDetails.controllers;
 import com.alfredTech.studentDetails.data.model.Student;
 import com.alfredTech.studentDetails.dtos.request.AddStudentRequest;
 import com.alfredTech.studentDetails.dtos.request.UpdateStudentRequest;
-import com.alfredTech.studentDetails.exceptions.StudentExistException;
 import com.alfredTech.studentDetails.exceptions.StudentNotFoundException;
 import com.alfredTech.studentDetails.services.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +23,8 @@ public class StudentController {
         return new ResponseEntity<>(studentService.getStudents(), HttpStatus.OK);
     }
     @PostMapping("/register")
-    public ResponseEntity<String> registerStudent(@RequestBody AddStudentRequest student) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(studentService.addStudent(student).toString());
-        }
-        catch (StudentExistException exception) {
-            System.out.println(exception.getMessage());
-        }
-       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User details already exist");
+    public Student registerStudent(@RequestBody AddStudentRequest student){
+            return studentService.addStudent(student);
     }
 
     @PutMapping("/update/{id}")
